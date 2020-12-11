@@ -56,6 +56,7 @@ export class TabsComponent implements AfterContentInit {
     dynamicTabs: TabComponent[] = [];
     @ViewChild(DynamicTabsDirective, {static: false}) dynamicTabPlaceholder: DynamicTabsDirective;
 
+    loadURL : string = "";
 
     ngAfterContentInit() {
         this.ds.getConfig().subscribe((config: Object) => {
@@ -71,6 +72,12 @@ export class TabsComponent implements AfterContentInit {
             });
             this.customizedConfig = this.configService.getFeatureList()
         });
+
+            //loadURL : string = "http://localhost:5000/static/export/adversary_1_60ba8984-3b68-11eb-834e-080027bab013.json";
+        if(window.location.href.indexOf("/fetch/")>-1) {
+            this.loadURL = decodeURIComponent(window.location.href.split("/fetch/")[1]);
+            this.loadLayerFromURL(this.loadURL, true);
+        }
     }
 
     /**
@@ -576,13 +583,14 @@ export class TabsComponent implements AfterContentInit {
         reader.readAsText(file);
     }
 
-    loadURL: string = "";
     /**
-     * attempt an HTTP GET to loadURL, and load the response (if it exists) as a layer.
+     * attempt an HTTP GET to loadURL, and load the response (if it exists) as a layer. 
      */
     loadLayerFromURL(loadURL, replace): Promise<any> {
+        
         let layerPromise: Promise<any> = new Promise((resolve, reject) => {
             // if (!loadURL.startsWith("http://") && !loadURL.startsWith("https://") && !loadURL.startsWith("FTP://")) loadURL = "https://" + loadURL;
+
             this.http.get(loadURL).subscribe((res) => {
                 let viewModel = this.viewModelsService.newViewModel("loading layer...", undefined);
                 try {
